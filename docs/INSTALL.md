@@ -1,146 +1,155 @@
 
-# DataTunerX Comprehensive Deployment Guide
+# DataTunerX 全面部署指南
 
-This guide provides detailed instructions for deploying DataTunerX in both online and offline environments. Ensure all prerequisites are met before proceeding with the deployment.
+本指南提供了在在线和离线环境中部署 DataTunerX 的详细说明。在进行部署之前，请确保满足以下所有前提条件。
 
-## Prerequisites
+## 前提条件
 
-Before starting, ensure your system meets the following requirements:
+开始之前，请确保您的系统符合以下要求：
 
-- **Kubernetes v1.19+**: The container orchestration system for automating software deployment, scaling, and management.
-- **Minio** or another S3-compatible object storage: For storing large datasets and models.
-- **Harbor** or another container image registry: For securely storing and managing container images.
-- **Helm**: The Kubernetes package manager for deploying and managing applications.
+- **Kubernetes v1.19+**: 容器编排系统，用于自动化软件部署、扩展和管理。
+- **Minio** 或其他兼容 S3 的对象存储：用于存储大型数据集和模型。
+- **Harbor**  或其他容器镜像注册表： 用于安全地存储和管理容器镜像。
+- **Helm**:  Kubernetes 应用程序的包管理器，用于部署和管理应用程序。
 
-## Deployment Artifacts
+## 部署工件
 
-Required artifacts:
+所需工件：
 
-- `dtx-ctl` DataTunerX deployment tool.
-- `images-ai.tar`: Optional llm offline image package. (The image size is 47.1GB)
-- `images.tar`: Optional business component offline image package.
+- `dtx-ctl` DataTunerX 部署工具。
+- `images-ai.tar`: 可选的 llm 离线镜像包（图像大小为 47.1GB）。
+- `images.tar`: 可选的业务组件离线镜像包。
 
-## Online Deployment
+## 在线部署
 
-### 1. Download the `dtx-ctl` Tool
+### 1. 下载 `dtx-ctl` 工具
 
 ```bash
 wget https://github.com/DataTunerX/dtx-ctl/releases/download/v0.1.0/dtx-ctl.tar.gz
 ```
 
-### 2. Deploy DataTunerX
+### 2. 部署 DataTunerX
 
-Deploy with default settings:
+使用默认设置部署：
 
 ```bash
 dtx-ctl install
 ```
 
-Or, with custom settings:
+或者，使用自定义设置部署：
+
 
 ```bash
 dtx-ctl install <name> -n <namespace> --set [Your-Custom-Settings]
 ```
 
-Or, using a configuration file:
+或者，使用配置文件部署：
+
 
 ```bash
 dtx-ctl install <name> -f /path/to/your/config.yaml
 ```
 
-## Offline Deployment
+## 离线部署
 
-Follow the online deployment steps for downloading the `dtx-ctl` tool and base images. Additionally, handle the business component images as follows:
 
-### 1. Download the `dtx-ctl` Tool
+按照在线部署步骤下载 `dtx-ctl` 工具和基础镜像。另外，按照以下步骤处理业务组件镜像：
+
+### 1. 下载  `dtx-ctl` 工具
 
 ```bash
 wget https://github.com/DataTunerX/dtx-ctl/releases/download/v0.1.0/dtx-ctl.tar.gz
 ```
 
-### 2. Download Base Images
+### 2. 下载基础镜像
 
 ```bash
 # Placeholder for the actual command to download the base AI images, currently the link is valid for 24 hours, if you need to apply for the download package please mention issuer
 wget https://public-download.daocloud.io/datatunerx/v0.1.0/images?e=1708664238&token=MHV7x1flrG19kzrdBNfPPO7JpBjTr__AMGzOtlq1:sZrIxT02pubO4BhPunS3sky3Fss=
 ```
 
-### 3. Download Base AI Images
+### 3. 下载基础 AI 镜像
 
 ```bash
 # Placeholder for the actual command to download the base AI images, currently the link is valid for 24 hours, if you need to apply for the download package please mention issuer
 wget https://public-download.daocloud.io/datatunerx/v0.1.0/images-ai?e=1708594433&token=MHV7x1flrG19kzrdBNfPPO7JpBjTr__AMGzOtlq1:DySesLobN0I7NeCBcYuZ74P8osA=
 ```
 
-### 4. Unzip and Import Business Image Package
+### 4. 解压并导入业务镜像包
 
 ```bash
 tar -zxcf images.tar -C /path/to/unzip
 cd /path/to/unzip/images
 ```
 
-For Docker:
+对于 Docker:
 
 ```bash
 docker load -i /path/to/image.tar
 ```
 
-For Containerd:
+对于 Containerd:
 
 ```bash
 ctr -n k8s.io images import /path/to/image.tar
 ```
 
-### 5. Modify Image Tags and Push to Your Image Repository
+### 5. 修改镜像标签并推送到您的镜像仓库
 
 ```bash
 docker tag source_image:tag target_repository/target_image:tag
 docker push target_repository/target_image:tag
 ```
 
-### 6. Deploy DataTunerX
+### 6. 部署 DataTunerX
 
-Deploy using custom settings to configure your image repository:
+使用自定义设置配置您的镜像仓库部署：
 
 ```bash
 dtx-ctl install <name> -n <namespace> --registry=your_registry --repository=your_repository
 ```
 
-Or, using a configuration file:
+或者，使用配置文件：
+
 
 ```bash
 dtx-ctl install <name> -f /path/to/your/config.yaml
 ```
 
-## Command-Line Command List
+## 命令行命令列表
 
-Commands to interact with `dtx-ctl`, including flags and subcommands for installation and management:
+与 `dtx-ctl`交互的命令，包括安装和管理的标志和子命令：
 
 ```bash
-# General usage
+# 一般用法
 dtx-ctl [command]
 
-# Available Commands
-completion  Generate the autocompletion script for the specified shell
-help        Help about any command
-install     Install DataTunerX on Kubernetes
-uninstall   Uninstall DataTunerX from Kubernetes
+# 可用命令
+completion  为指定的 shell 生成自动完成脚本
+help        获取有关任何命令的帮助
+install     在 Kubernetes 上安装 DataTunerX
+uninstall   从 Kubernetes 中卸载 DataTunerX
 
-# Flags for installation
---chart-directory string     Helm chart directory
---dry-run                    Simulate an install
---image-file-dir string      Specify an image file directory
---image-pull-policy string   Image pull policy
---image-pull-secret string   Image pull secret
---registry string            Container registry
---repository string          Container repository
---set stringArray            Set helm values
---set-file stringArray       Set helm values from files
---set-string stringArray     Set helm STRING values
--f, --values strings         Specify helm values in a YAML file
---version string             Chart version
---wait                       Wait for installation completion
---wait-duration duration     Maximum time to wait for resource readiness
+# 安装标志
+--chart-directory string     Helm 图表目录
+--dry-run                    模拟安装
+--image-file-dir string      指定镜像文件目录
+--image-pull-policy string   镜像拉取策略
+--image-pull-secret string   镜像拉取密钥
+--registry string            容器注册表
+--repository string          容器仓库
+--set stringArray            设置 Helm 值
+--set-file stringArray       从文件设置 Helm 值
+--set-string stringArray     设置 Helm 字符串值
+-f, --values strings         在 YAML 文件中指定 Helm 值
+--version string             图表版本
+--wait                       等待安装完成
+--wait-duration duration     最长等待资源准备就绪的时间
 ```
 
-Please replace placeholders with actual values and download links as required.
+请根据需要替换占位符和实际值以及下载链接。
+
+
+
+
+
